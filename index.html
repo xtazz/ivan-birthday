@@ -201,15 +201,61 @@
       function initGame() {
         level1Screen.classList.add("active");
         gameRunning = true;
-        
+
         // Reset State
         // Increased size to 36 (was 30) for better fit in 40px tiles
-        hero = { x: TILE_SIZE, y: TILE_SIZE, w: 36, h: 36, speed: 3, color: '#FFD700', name: 'IVAN', emoji: '😎', dead: false };
+        hero = {
+          x: TILE_SIZE,
+          y: TILE_SIZE,
+          w: 36,
+          h: 36,
+          speed: 4,
+          color: "#FFD700",
+          name: "IVAN",
+          emoji: "😎",
+          dead: false,
+        };
         enemies = [
           // Reduced speed to 1 (was 2)
-          { x: (COLS-2)*TILE_SIZE, y: (ROWS-2)*TILE_SIZE, w: 36, h: 36, speed: 1, color: '#00FF00', name: 'OLEG', emoji: '🤓', dead: false, dir: 0, moveTimer: 0 },
-          { x: TILE_SIZE, y: (ROWS-2)*TILE_SIZE, w: 36, h: 36, speed: 1, color: '#0000FF', name: 'PAVEL', emoji: '🤡', dead: false, dir: 0, moveTimer: 0 },
-          { x: (COLS-2)*TILE_SIZE, y: TILE_SIZE, w: 36, h: 36, speed: 1, color: '#800080', name: 'PETR', emoji: '🤖', dead: false, dir: 0, moveTimer: 0 }
+          {
+            x: (COLS - 2) * TILE_SIZE,
+            y: (ROWS - 2) * TILE_SIZE,
+            w: 36,
+            h: 36,
+            speed: 1,
+            color: "#00FF00",
+            name: "OLEG",
+            emoji: "🤓",
+            dead: false,
+            dir: 0,
+            moveTimer: 0,
+          },
+          {
+            x: TILE_SIZE,
+            y: (ROWS - 2) * TILE_SIZE,
+            w: 36,
+            h: 36,
+            speed: 1,
+            color: "#0000FF",
+            name: "PAVEL",
+            emoji: "👹",
+            dead: false,
+            dir: 0,
+            moveTimer: 0,
+          },
+          {
+            x: (COLS - 2) * TILE_SIZE,
+            y: TILE_SIZE,
+            w: 36,
+            h: 36,
+            speed: 1,
+            color: "#800080",
+            name: "PETR",
+            emoji: "🤖",
+            dead: false,
+            dir: 0,
+            moveTimer: 0,
+          },
         ];
         bombs = [];
         explosions = [];
@@ -287,17 +333,45 @@
           let newX = hero.x + dx;
           let newY = hero.y + dy;
 
-          // Check X
-          if (
-            !checkCollision({ x: newX, y: hero.y, w: hero.w, h: hero.h }, true)
-          ) {
-            hero.x = newX;
-          }
-          // Check Y
-          if (
-            !checkCollision({ x: hero.x, y: newY, w: hero.w, h: hero.h }, true)
-          ) {
-            hero.y = newY;
+          // Corner Sliding / Lane Assist
+          // If we hit a wall, check if we can slide around it
+          if (dx !== 0 && dy === 0) { // Moving Horizontal
+             if (checkCollision({ x: newX, y: hero.y, w: hero.w, h: hero.h }, true)) {
+                // Collision! Check if we are misaligned vertically
+                let gridY = Math.round(hero.y / TILE_SIZE);
+                let targetY = gridY * TILE_SIZE + (TILE_SIZE - hero.h)/2;
+                let diff = targetY - hero.y;
+                if (Math.abs(diff) > 0 && Math.abs(diff) < 15) { // Tolerance
+                   let slideStep = Math.sign(diff) * hero.speed;
+                   // Try to move X AND slide Y
+                   if (!checkCollision({ x: newX, y: hero.y + slideStep, w: hero.w, h: hero.h }, true)) {
+                      hero.x = newX;
+                      hero.y += slideStep;
+                   }
+                }
+             } else {
+                hero.x = newX;
+             }
+          } else if (dy !== 0 && dx === 0) { // Moving Vertical
+             if (checkCollision({ x: hero.x, y: newY, w: hero.w, h: hero.h }, true)) {
+                // Collision! Check if we are misaligned horizontally
+                let gridX = Math.round(hero.x / TILE_SIZE);
+                let targetX = gridX * TILE_SIZE + (TILE_SIZE - hero.w)/2;
+                let diff = targetX - hero.x;
+                if (Math.abs(diff) > 0 && Math.abs(diff) < 15) {
+                   let slideStep = Math.sign(diff) * hero.speed;
+                   if (!checkCollision({ x: hero.x + slideStep, y: newY, w: hero.w, h: hero.h }, true)) {
+                      hero.y = newY;
+                      hero.x += slideStep;
+                   }
+                }
+             } else {
+                hero.y = newY;
+             }
+          } else {
+             // Diagonal or other (not supported by controls but good to have fallback)
+             if (!checkCollision({ x: newX, y: hero.y, w: hero.w, h: hero.h }, true)) hero.x = newX;
+             if (!checkCollision({ x: hero.x, y: newY, w: hero.w, h: hero.h }, true)) hero.y = newY;
           }
         }
 
@@ -482,18 +556,18 @@
         });
 
         // Enemies
-        enemies.forEach(en => {
+        enemies.forEach((en) => {
           if (en.dead) return;
           // Draw Emoji
           ctx.font = "30px Arial";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText(en.emoji, en.x + en.w/2, en.y + en.h/2 + 2);
-          
+          ctx.fillText(en.emoji, en.x + en.w / 2, en.y + en.h / 2 + 2);
+
           // Name
           ctx.fillStyle = "#fff";
           ctx.font = "10px 'Press Start 2P'";
-          ctx.fillText(en.name, en.x + en.w/2, en.y - 10);
+          ctx.fillText(en.name, en.x + en.w / 2, en.y - 10);
         });
 
         // Hero
@@ -502,11 +576,15 @@
           ctx.font = "30px Arial";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText(hero.emoji, hero.x + hero.w/2, hero.y + hero.h/2 + 2);
+          ctx.fillText(
+            hero.emoji,
+            hero.x + hero.w / 2,
+            hero.y + hero.h / 2 + 2
+          );
 
           ctx.fillStyle = "#fff";
           ctx.font = "10px 'Press Start 2P'";
-          ctx.fillText(hero.name, hero.x + hero.w/2, hero.y - 10);
+          ctx.fillText(hero.name, hero.x + hero.w / 2, hero.y - 10);
         }
       }
 

@@ -138,7 +138,7 @@
       const level1Screen = document.getElementById("level1-screen");
       const canvas = document.getElementById("game-canvas");
       const ctx = canvas.getContext("2d");
-      
+
       const menuItems = document.querySelectorAll(".menu-item");
       let selectedIndex = 0;
       let gameRunning = false;
@@ -148,7 +148,7 @@
       const TILE_SIZE = 40;
       const COLS = 19;
       const ROWS = 13;
-      
+
       // Game State
       let hero = {};
       let enemies = [];
@@ -174,7 +174,8 @@
             selectedIndex = selectedIndex === 0 ? 1 : 0;
             updateSelection();
           } else if (e.key === "Enter") {
-            const selectedValue = menuItems[selectedIndex].getAttribute("data-value");
+            const selectedValue =
+              menuItems[selectedIndex].getAttribute("data-value");
             startScreen.classList.remove("active");
             if (selectedValue === "yes") {
               initGame();
@@ -200,13 +201,55 @@
       function initGame() {
         level1Screen.classList.add("active");
         gameRunning = true;
-        
+
         // Reset State
-        hero = { x: TILE_SIZE, y: TILE_SIZE, w: 30, h: 30, speed: 3, color: '#FFD700', name: 'IVAN', dead: false };
+        hero = {
+          x: TILE_SIZE,
+          y: TILE_SIZE,
+          w: 30,
+          h: 30,
+          speed: 3,
+          color: "#FFD700",
+          name: "IVAN",
+          dead: false,
+        };
         enemies = [
-          { x: (COLS-2)*TILE_SIZE, y: (ROWS-2)*TILE_SIZE, w: 30, h: 30, speed: 2, color: '#00FF00', name: 'OLEG', dead: false, dir: 0, moveTimer: 0 },
-          { x: TILE_SIZE, y: (ROWS-2)*TILE_SIZE, w: 30, h: 30, speed: 2, color: '#0000FF', name: 'PAVEL', dead: false, dir: 0, moveTimer: 0 },
-          { x: (COLS-2)*TILE_SIZE, y: TILE_SIZE, w: 30, h: 30, speed: 2, color: '#800080', name: 'PETR', dead: false, dir: 0, moveTimer: 0 }
+          {
+            x: (COLS - 2) * TILE_SIZE,
+            y: (ROWS - 2) * TILE_SIZE,
+            w: 30,
+            h: 30,
+            speed: 2,
+            color: "#00FF00",
+            name: "OLEG",
+            dead: false,
+            dir: 0,
+            moveTimer: 0,
+          },
+          {
+            x: TILE_SIZE,
+            y: (ROWS - 2) * TILE_SIZE,
+            w: 30,
+            h: 30,
+            speed: 2,
+            color: "#0000FF",
+            name: "PAVEL",
+            dead: false,
+            dir: 0,
+            moveTimer: 0,
+          },
+          {
+            x: (COLS - 2) * TILE_SIZE,
+            y: TILE_SIZE,
+            w: 30,
+            h: 30,
+            speed: 2,
+            color: "#800080",
+            name: "PETR",
+            dead: false,
+            dir: 0,
+            moveTimer: 0,
+          },
         ];
         bombs = [];
         explosions = [];
@@ -215,7 +258,13 @@
         // Generate Map (Simple Grid)
         for (let r = 0; r < ROWS; r++) {
           for (let c = 0; c < COLS; c++) {
-            if (r === 0 || r === ROWS - 1 || c === 0 || c === COLS - 1 || (r % 2 === 0 && c % 2 === 0)) {
+            if (
+              r === 0 ||
+              r === ROWS - 1 ||
+              c === 0 ||
+              c === COLS - 1 ||
+              (r % 2 === 0 && c % 2 === 0)
+            ) {
               walls.push({ x: c * TILE_SIZE, y: r * TILE_SIZE });
             }
           }
@@ -229,14 +278,15 @@
         // Snap to grid
         const gx = Math.round(hero.x / TILE_SIZE);
         const gy = Math.round(hero.y / TILE_SIZE);
-        
+
         // Check if bomb already exists there
-        if (!bombs.some(b => b.gx === gx && b.gy === gy)) {
-          bombs.push({ 
-            gx, gy, 
-            x: gx * TILE_SIZE, 
-            y: gy * TILE_SIZE, 
-            timer: 180 // 3 seconds at 60fps
+        if (!bombs.some((b) => b.gx === gx && b.gy === gy)) {
+          bombs.push({
+            gx,
+            gy,
+            x: gx * TILE_SIZE,
+            y: gy * TILE_SIZE,
+            timer: 180, // 3 seconds at 60fps
           });
         }
       }
@@ -244,10 +294,12 @@
       function checkCollision(rect, isHero = false) {
         // Wall collisions
         for (let wall of walls) {
-          if (rect.x < wall.x + TILE_SIZE &&
-              rect.x + rect.w > wall.x &&
-              rect.y < wall.y + TILE_SIZE &&
-              rect.y + rect.h > wall.y) {
+          if (
+            rect.x < wall.x + TILE_SIZE &&
+            rect.x + rect.w > wall.x &&
+            rect.y < wall.y + TILE_SIZE &&
+            rect.y + rect.h > wall.y
+          ) {
             return true;
           }
         }
@@ -274,43 +326,50 @@
         if (dx !== 0 || dy !== 0) {
           let newX = hero.x + dx;
           let newY = hero.y + dy;
-          
+
           // Check X
-          if (!checkCollision({x: newX, y: hero.y, w: hero.w, h: hero.h}, true)) {
+          if (
+            !checkCollision({ x: newX, y: hero.y, w: hero.w, h: hero.h }, true)
+          ) {
             hero.x = newX;
           }
           // Check Y
-          if (!checkCollision({x: hero.x, y: newY, w: hero.w, h: hero.h}, true)) {
+          if (
+            !checkCollision({ x: hero.x, y: newY, w: hero.w, h: hero.h }, true)
+          ) {
             hero.y = newY;
           }
         }
 
         // Enemy AI
-        enemies.forEach(en => {
+        enemies.forEach((en) => {
           if (en.dead) return;
-          
+
           en.moveTimer--;
           if (en.moveTimer <= 0) {
             // Pick a direction towards Ivan with some randomness
             if (Math.random() < 0.7) {
-               if (Math.abs(hero.x - en.x) > Math.abs(hero.y - en.y)) {
-                 en.dir = hero.x > en.x ? 1 : 3; // 1: Right, 3: Left
-               } else {
-                 en.dir = hero.y > en.y ? 2 : 0; // 2: Down, 0: Up
-               }
+              if (Math.abs(hero.x - en.x) > Math.abs(hero.y - en.y)) {
+                en.dir = hero.x > en.x ? 1 : 3; // 1: Right, 3: Left
+              } else {
+                en.dir = hero.y > en.y ? 2 : 0; // 2: Down, 0: Up
+              }
             } else {
-               en.dir = Math.floor(Math.random() * 4);
+              en.dir = Math.floor(Math.random() * 4);
             }
             en.moveTimer = 30 + Math.random() * 30;
           }
 
-          let ex = 0, ey = 0;
+          let ex = 0,
+            ey = 0;
           if (en.dir === 0) ey = -en.speed;
           if (en.dir === 2) ey = en.speed;
           if (en.dir === 3) ex = -en.speed;
           if (en.dir === 1) ex = en.speed;
 
-          if (!checkCollision({x: en.x + ex, y: en.y + ey, w: en.w, h: en.h})) {
+          if (
+            !checkCollision({ x: en.x + ex, y: en.y + ey, w: en.w, h: en.h })
+          ) {
             en.x += ex;
             en.y += ey;
           } else {
@@ -348,7 +407,7 @@
             level1Screen.classList.remove("active");
             gameOverScreen.classList.add("active");
           }, 1000);
-        } else if (enemies.every(e => e.dead)) {
+        } else if (enemies.every((e) => e.dead)) {
           gameRunning = false;
           setTimeout(() => {
             level1Screen.classList.remove("active");
@@ -358,34 +417,50 @@
       }
 
       function createExplosion(gx, gy) {
-        let cells = [{x: gx, y: gy}];
+        let cells = [{ x: gx, y: gy }];
         // Directions: Up, Right, Down, Left
-        const dirs = [{x:0, y:-1}, {x:1, y:0}, {x:0, y:1}, {x:-1, y:0}];
-        
-        dirs.forEach(d => {
-          for (let k = 1; k <= 3; k++) { // Range 3
+        const dirs = [
+          { x: 0, y: -1 },
+          { x: 1, y: 0 },
+          { x: 0, y: 1 },
+          { x: -1, y: 0 },
+        ];
+
+        dirs.forEach((d) => {
+          for (let k = 1; k <= 3; k++) {
+            // Range 3
             let tx = gx + d.x * k;
             let ty = gy + d.y * k;
             // Check wall
-            if (walls.some(w => w.x === tx * TILE_SIZE && w.y === ty * TILE_SIZE)) break;
-            cells.push({x: tx, y: ty});
+            if (
+              walls.some(
+                (w) => w.x === tx * TILE_SIZE && w.y === ty * TILE_SIZE
+              )
+            )
+              break;
+            cells.push({ x: tx, y: ty });
           }
         });
-        
+
         explosions.push({ cells, timer: 30 }); // 0.5s
       }
 
       function checkExplosionHit(explosion) {
-        explosion.cells.forEach(cell => {
-          let exRect = { x: cell.x * TILE_SIZE, y: cell.y * TILE_SIZE, w: TILE_SIZE, h: TILE_SIZE };
-          
+        explosion.cells.forEach((cell) => {
+          let exRect = {
+            x: cell.x * TILE_SIZE,
+            y: cell.y * TILE_SIZE,
+            w: TILE_SIZE,
+            h: TILE_SIZE,
+          };
+
           // Check Hero
           if (rectIntersect(exRect, hero)) {
             hero.dead = true;
           }
-          
+
           // Check Enemies
-          enemies.forEach(en => {
+          enemies.forEach((en) => {
             if (!en.dead && rectIntersect(exRect, en)) {
               en.dead = true;
             }
@@ -394,10 +469,12 @@
       }
 
       function rectIntersect(r1, r2) {
-        return !(r2.x > r1.x + r1.w || 
-                 r2.x + r2.w < r1.x || 
-                 r2.y > r1.y + r1.h || 
-                 r2.y + r2.h < r1.y);
+        return !(
+          r2.x > r1.x + r1.w ||
+          r2.x + r2.w < r1.x ||
+          r2.y > r1.y + r1.h ||
+          r2.y + r2.h < r1.y
+        );
       }
 
       function draw() {
@@ -407,7 +484,7 @@
 
         // Walls
         ctx.fillStyle = "#555";
-        walls.forEach(w => {
+        walls.forEach((w) => {
           ctx.fillRect(w.x, w.y, TILE_SIZE, TILE_SIZE);
           // 3D effect
           ctx.fillStyle = "#777";
@@ -419,30 +496,40 @@
         ctx.font = "30px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        bombs.forEach(b => {
-          ctx.fillText("💩", b.x + TILE_SIZE/2, b.y + TILE_SIZE/2 + 2);
+        bombs.forEach((b) => {
+          ctx.fillText("💩", b.x + TILE_SIZE / 2, b.y + TILE_SIZE / 2 + 2);
         });
 
         // Explosions
         ctx.fillStyle = "#FF4500";
-        explosions.forEach(e => {
-          e.cells.forEach(c => {
-            ctx.fillRect(c.x * TILE_SIZE, c.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        explosions.forEach((e) => {
+          e.cells.forEach((c) => {
+            ctx.fillRect(
+              c.x * TILE_SIZE,
+              c.y * TILE_SIZE,
+              TILE_SIZE,
+              TILE_SIZE
+            );
             ctx.fillStyle = "#FFFF00";
-            ctx.fillRect(c.x * TILE_SIZE + 5, c.y * TILE_SIZE + 5, TILE_SIZE - 10, TILE_SIZE - 10);
+            ctx.fillRect(
+              c.x * TILE_SIZE + 5,
+              c.y * TILE_SIZE + 5,
+              TILE_SIZE - 10,
+              TILE_SIZE - 10
+            );
             ctx.fillStyle = "#FF4500";
           });
         });
 
         // Enemies
-        enemies.forEach(en => {
+        enemies.forEach((en) => {
           if (en.dead) return;
           ctx.fillStyle = en.color;
           ctx.fillRect(en.x, en.y, en.w, en.h);
           // Name
           ctx.fillStyle = "#fff";
           ctx.font = "10px 'Press Start 2P'";
-          ctx.fillText(en.name, en.x + en.w/2, en.y - 10);
+          ctx.fillText(en.name, en.x + en.w / 2, en.y - 10);
         });
 
         // Hero
@@ -451,7 +538,7 @@
           ctx.fillRect(hero.x, hero.y, hero.w, hero.h);
           ctx.fillStyle = "#fff";
           ctx.font = "10px 'Press Start 2P'";
-          ctx.fillText(hero.name, hero.x + hero.w/2, hero.y - 10);
+          ctx.fillText(hero.name, hero.x + hero.w / 2, hero.y - 10);
         }
       }
 

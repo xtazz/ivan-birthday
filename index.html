@@ -448,7 +448,10 @@
           // Check collision with Hero
           if (!hero.dead && rectIntersect(hero, en)) {
             hero.dead = true;
-            setTimeout(() => showGameOver("CAUGHT BY FRIENDS! TOO MUCH LOVE!"), 1000);
+            setTimeout(
+              () => showGameOver("CAUGHT BY FRIENDS! TOO MUCH LOVE!"),
+              1000
+            );
           }
         });
 
@@ -477,7 +480,7 @@
 
         // Check Win/Loss
         if (hero.dead) {
-           // Handled in collision checks
+          // Handled in collision checks
         } else if (enemies.every((e) => e.dead)) {
           gameRunning = false;
           setTimeout(() => {

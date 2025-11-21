@@ -436,6 +436,11 @@
           } else {
             en.moveTimer = 0; // Change dir immediately
           }
+
+          // Check collision with Hero
+          if (!hero.dead && rectIntersect(hero, en)) {
+            hero.dead = true;
+          }
         });
 
         // Bombs

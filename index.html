@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ivan's Birthday Quest</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* CSS for 8-bit style */
+      body {
+        background-color: #202020;
+        color: #fff;
+        font-family: "Press Start 2P", cursive;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+      }
+      #game-container {
+        width: 800px;
+        height: 600px;
+        background-color: #000;
+        border: 4px solid #fff;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+      }
+      .screen {
+        display: none;
+        text-align: center;
+        width: 100%;
+      }
+      .screen.active {
+        display: block;
+      }
+      h1 {
+        color: #ff0055;
+        text-shadow: 4px 4px #00ffcc;
+        font-size: 40px;
+        margin-bottom: 60px;
+        line-height: 1.5;
+      }
+      .menu-item {
+        font-size: 24px;
+        margin: 20px 0;
+        color: #fff;
+        cursor: pointer;
+      }
+      .menu-item.selected {
+        color: #ffff00;
+      }
+      .menu-item.selected::before {
+        content: "► ";
+        color: #ffff00;
+      }
+      .game-over {
+        color: #ff0000;
+        font-size: 60px;
+        text-shadow: 4px 4px #550000;
+      }
+      .happy-birthday {
+        color: #00ff00;
+        font-size: 40px;
+        text-shadow: 4px 4px #005500;
+        animation: blink 1s infinite;
+      }
+      @keyframes blink {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      .instruction {
+        position: absolute;
+        bottom: 20px;
+        font-size: 12px;
+        color: #666;
+        width: 100%;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container">
+      <!-- Start Screen -->
+      <div id="start-screen" class="screen active">
+        <h1>IVAN'S BIRTHDAY<br />QUEST</h1>
+        <div style="margin-bottom: 40px; color: #00ccff">ARE YOU IVAN?</div>
+        <div class="menu-item selected" data-value="yes">YES</div>
+        <div class="menu-item" data-value="no">NO</div>
+        <div class="instruction">USE ARROW KEYS AND ENTER</div>
+      </div>
+
+      <!-- Game Over Screen -->
+      <div id="game-over-screen" class="screen">
+        <h1 class="game-over">GAME OVER</h1>
+        <p>ONLY IVAN CAN PLAY</p>
+        <p style="font-size: 12px; margin-top: 50px; color: #666">
+          REFRESH TO TRY AGAIN
+        </p>
+      </div>
+
+      <!-- Success Screen -->
+      <div id="success-screen" class="screen">
+        <h1 class="happy-birthday">HAPPY BIRTHDAY<br />IVAN!</h1>
+        <p style="color: #ffff00; margin-top: 30px">LEVEL 1 CLEARED</p>
+      </div>
+    </div>
+
+    <script>
+      // JavaScript for game logic
+      const startScreen = document.getElementById("start-screen");
+      const gameOverScreen = document.getElementById("game-over-screen");
+      const successScreen = document.getElementById("success-screen");
+      const menuItems = document.querySelectorAll(".menu-item");
+      let selectedIndex = 0;
+
+      function updateSelection() {
+        menuItems.forEach((item, index) => {
+          if (index === selectedIndex) {
+            item.classList.add("selected");
+          } else {
+            item.classList.remove("selected");
+          }
+        });
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (startScreen.classList.contains("active")) {
+          if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+            selectedIndex = selectedIndex === 0 ? 1 : 0;
+            updateSelection();
+          } else if (e.key === "Enter") {
+            const selectedValue =
+              menuItems[selectedIndex].getAttribute("data-value");
+            startScreen.classList.remove("active");
+            if (selectedValue === "yes") {
+              successScreen.classList.add("active");
+            } else {
+              gameOverScreen.classList.add("active");
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

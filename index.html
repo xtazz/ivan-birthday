@@ -264,14 +264,10 @@
         // Generate Map (Simple Grid)
         for (let r = 0; r < ROWS; r++) {
           for (let c = 0; c < COLS; c++) {
-            if (
-              r === 0 ||
-              r === ROWS - 1 ||
-              c === 0 ||
-              c === COLS - 1 ||
-              (r % 2 === 0 && c % 2 === 0)
-            ) {
-              walls.push({ x: c * TILE_SIZE, y: r * TILE_SIZE });
+            if (r === 0 || r === ROWS - 1 || c === 0 || c === COLS - 1) {
+              walls.push({ x: c * TILE_SIZE, y: r * TILE_SIZE, type: 'outer' });
+            } else if (r % 2 === 0 && c % 2 === 0) {
+              walls.push({ x: c * TILE_SIZE, y: r * TILE_SIZE, type: 'inner' });
             }
           }
         }
@@ -548,13 +544,34 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Walls
-        ctx.fillStyle = "#555";
         walls.forEach((w) => {
-          ctx.fillRect(w.x, w.y, TILE_SIZE, TILE_SIZE);
-          // 3D effect
-          ctx.fillStyle = "#777";
-          ctx.fillRect(w.x + 2, w.y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-          ctx.fillStyle = "#555";
+          if (w.type === 'outer') {
+            // Outer Walls - Concrete Style
+            ctx.fillStyle = "#555";
+            ctx.fillRect(w.x, w.y, TILE_SIZE, TILE_SIZE);
+            // Bevel
+            ctx.fillStyle = "#777";
+            ctx.fillRect(w.x, w.y, TILE_SIZE, 4); // Top
+            ctx.fillRect(w.x, w.y, 4, TILE_SIZE); // Left
+            ctx.fillStyle = "#333";
+            ctx.fillRect(w.x + TILE_SIZE - 4, w.y, 4, TILE_SIZE); // Right
+            ctx.fillRect(w.x, w.y + TILE_SIZE - 4, TILE_SIZE, 4); // Bottom
+          } else {
+            // Inner Walls - Blue/Grey Block
+            ctx.fillStyle = "#4682B4"; // SteelBlue
+            ctx.fillRect(w.x, w.y, TILE_SIZE, TILE_SIZE);
+            
+            // Inner detail (lighter square)
+            ctx.fillStyle = "#5D9CC9";
+            ctx.fillRect(w.x + 4, w.y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
+            
+            // Rivets (dark corners)
+            ctx.fillStyle = "#204060";
+            ctx.fillRect(w.x + 2, w.y + 2, 4, 4);
+            ctx.fillRect(w.x + TILE_SIZE - 6, w.y + 2, 4, 4);
+            ctx.fillRect(w.x + 2, w.y + TILE_SIZE - 6, 4, 4);
+            ctx.fillRect(w.x + TILE_SIZE - 6, w.y + TILE_SIZE - 6, 4, 4);
+          }
         });
 
         // Bombs
@@ -566,23 +583,22 @@
         });
 
         // Explosions
-        ctx.fillStyle = "#FF4500";
         explosions.forEach((e) => {
           e.cells.forEach((c) => {
-            ctx.fillRect(
-              c.x * TILE_SIZE,
-              c.y * TILE_SIZE,
-              TILE_SIZE,
-              TILE_SIZE
-            );
-            ctx.fillStyle = "#FFFF00";
-            ctx.fillRect(
-              c.x * TILE_SIZE + 5,
-              c.y * TILE_SIZE + 5,
-              TILE_SIZE - 10,
-              TILE_SIZE - 10
-            );
-            ctx.fillStyle = "#FF4500";
+            // Background flash
+            ctx.fillStyle = "#8B4513";
+            ctx.globalAlpha = 0.6;
+            ctx.fillRect(c.x * TILE_SIZE, c.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            ctx.globalAlpha = 1.0;
+            
+            // Poo Explosion
+            ctx.font = "30px Arial";
+            ctx.fillText("💩", c.x * TILE_SIZE + TILE_SIZE/2, c.y * TILE_SIZE + TILE_SIZE/2 + 2);
+            
+            // Small particles
+            ctx.fillStyle = "#FFD700";
+            ctx.fillRect(c.x * TILE_SIZE + Math.random()*30, c.y * TILE_SIZE + Math.random()*30, 4, 4);
+            ctx.fillRect(c.x * TILE_SIZE + Math.random()*30, c.y * TILE_SIZE + Math.random()*30, 4, 4);
           });
         });
 

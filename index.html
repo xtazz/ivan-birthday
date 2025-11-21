@@ -201,55 +201,15 @@
       function initGame() {
         level1Screen.classList.add("active");
         gameRunning = true;
-
+        
         // Reset State
-        hero = {
-          x: TILE_SIZE,
-          y: TILE_SIZE,
-          w: 30,
-          h: 30,
-          speed: 3,
-          color: "#FFD700",
-          name: "IVAN",
-          dead: false,
-        };
+        // Increased size to 36 (was 30) for better fit in 40px tiles
+        hero = { x: TILE_SIZE, y: TILE_SIZE, w: 36, h: 36, speed: 3, color: '#FFD700', name: 'IVAN', emoji: '😎', dead: false };
         enemies = [
-          {
-            x: (COLS - 2) * TILE_SIZE,
-            y: (ROWS - 2) * TILE_SIZE,
-            w: 30,
-            h: 30,
-            speed: 2,
-            color: "#00FF00",
-            name: "OLEG",
-            dead: false,
-            dir: 0,
-            moveTimer: 0,
-          },
-          {
-            x: TILE_SIZE,
-            y: (ROWS - 2) * TILE_SIZE,
-            w: 30,
-            h: 30,
-            speed: 2,
-            color: "#0000FF",
-            name: "PAVEL",
-            dead: false,
-            dir: 0,
-            moveTimer: 0,
-          },
-          {
-            x: (COLS - 2) * TILE_SIZE,
-            y: TILE_SIZE,
-            w: 30,
-            h: 30,
-            speed: 2,
-            color: "#800080",
-            name: "PETR",
-            dead: false,
-            dir: 0,
-            moveTimer: 0,
-          },
+          // Reduced speed to 1 (was 2)
+          { x: (COLS-2)*TILE_SIZE, y: (ROWS-2)*TILE_SIZE, w: 36, h: 36, speed: 1, color: '#00FF00', name: 'OLEG', emoji: '🤓', dead: false, dir: 0, moveTimer: 0 },
+          { x: TILE_SIZE, y: (ROWS-2)*TILE_SIZE, w: 36, h: 36, speed: 1, color: '#0000FF', name: 'PAVEL', emoji: '🤡', dead: false, dir: 0, moveTimer: 0 },
+          { x: (COLS-2)*TILE_SIZE, y: TILE_SIZE, w: 36, h: 36, speed: 1, color: '#800080', name: 'PETR', emoji: '🤖', dead: false, dir: 0, moveTimer: 0 }
         ];
         bombs = [];
         explosions = [];
@@ -522,23 +482,31 @@
         });
 
         // Enemies
-        enemies.forEach((en) => {
+        enemies.forEach(en => {
           if (en.dead) return;
-          ctx.fillStyle = en.color;
-          ctx.fillRect(en.x, en.y, en.w, en.h);
+          // Draw Emoji
+          ctx.font = "30px Arial";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(en.emoji, en.x + en.w/2, en.y + en.h/2 + 2);
+          
           // Name
           ctx.fillStyle = "#fff";
           ctx.font = "10px 'Press Start 2P'";
-          ctx.fillText(en.name, en.x + en.w / 2, en.y - 10);
+          ctx.fillText(en.name, en.x + en.w/2, en.y - 10);
         });
 
         // Hero
         if (!hero.dead) {
-          ctx.fillStyle = hero.color;
-          ctx.fillRect(hero.x, hero.y, hero.w, hero.h);
+          // Draw Emoji
+          ctx.font = "30px Arial";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(hero.emoji, hero.x + hero.w/2, hero.y + hero.h/2 + 2);
+
           ctx.fillStyle = "#fff";
           ctx.font = "10px 'Press Start 2P'";
-          ctx.fillText(hero.name, hero.x + hero.w / 2, hero.y - 10);
+          ctx.fillText(hero.name, hero.x + hero.w/2, hero.y - 10);
         }
       }
 

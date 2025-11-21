@@ -117,7 +117,7 @@
       <!-- Game Over Screen -->
       <div id="game-over-screen" class="screen">
         <h1 class="game-over">GAME OVER</h1>
-        <p>ONLY IVAN CAN PLAY</p>
+        <p id="game-over-reason">ONLY IVAN CAN PLAY</p>
         <p style="font-size: 12px; margin-top: 50px; color: #666">
           REFRESH TO TRY AGAIN
         </p>
@@ -134,6 +134,7 @@
       // JavaScript for game logic
       const startScreen = document.getElementById("start-screen");
       const gameOverScreen = document.getElementById("game-over-screen");
+      const gameOverReason = document.getElementById("game-over-reason");
       const successScreen = document.getElementById("success-screen");
       const level1Screen = document.getElementById("level1-screen");
       const canvas = document.getElementById("game-canvas");
@@ -180,7 +181,7 @@
             if (selectedValue === "yes") {
               initGame();
             } else {
-              gameOverScreen.classList.add("active");
+              showGameOver("ONLY IVAN CAN PLAY");
             }
           }
         } else if (gameRunning) {
@@ -196,6 +197,13 @@
           keys[e.key] = false;
         }
       });
+
+      function showGameOver(reason) {
+        gameRunning = false;
+        level1Screen.classList.remove("active");
+        gameOverReason.innerText = reason;
+        gameOverScreen.classList.add("active");
+      }
 
       // Game Logic
       function initGame() {
@@ -440,6 +448,7 @@
           // Check collision with Hero
           if (!hero.dead && rectIntersect(hero, en)) {
             hero.dead = true;
+            setTimeout(() => showGameOver("CAUGHT BY FRIENDS! TOO MUCH LOVE!"), 1000);
           }
         });
 
@@ -468,11 +477,7 @@
 
         // Check Win/Loss
         if (hero.dead) {
-          gameRunning = false;
-          setTimeout(() => {
-            level1Screen.classList.remove("active");
-            gameOverScreen.classList.add("active");
-          }, 1000);
+           // Handled in collision checks
         } else if (enemies.every((e) => e.dead)) {
           gameRunning = false;
           setTimeout(() => {
@@ -523,6 +528,7 @@
           // Check Hero
           if (rectIntersect(exRect, hero)) {
             hero.dead = true;
+            setTimeout(() => showGameOver("YOU POOED YOURSELF! OOPS!"), 1000);
           }
 
           // Check Enemies
